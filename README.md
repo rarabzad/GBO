@@ -26,13 +26,13 @@ We aim to determine optimal **release decisions** for a reservoir system to mini
 ```r
 inflow <- as.numeric(Nile)   # Nile R. Annual flow
 n_years <- length(inflow)
-demand <- rnorm(n_years, inflow * 0.9, inflow * 0.9 * 0.2) # Create synthetic demand
+demand <- rnorm(n_years, inflow * 0.8, inflow * 0.8 * 0.2) # Create synthetic demand
 evaporation <- rnorm(n_years, inflow * 0.2, inflow * 0.2 * 0.2) # Create synthetic evaporation
 
 nP <- 100       # Population size
 MaxIt <- 1000   # Max iterations
 lb <- rep(0,n_years)         # Lower bound
-max_capacity <- 1000 # Maximum storage capacity
+max_capacity <- 400 # Maximum storage capacity
 min_capacity <- 100
 ub <- demand  # Upper bound
 
