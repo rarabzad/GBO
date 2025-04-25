@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This repository implements the **Gradient-Based Optimizer (GBO)**, a novel metaheuristic optimization algorithm inspired by gradient search techniques. The GBO algorithm was introduced by Ahmadianfar et al. in their 2020 paper: ([Gradient-Based Optimizer: A New Metaheuristic ... ]([https://www.researchgate.net/publication/342456958_Gradient-Based_Optimizer_A_New_Metaheuristic_Optimization_Algorithm?utm_source=chatgpt.com](https://doi.org/10.1016/j.ins.2020.06.037](https://www.sciencedirect.com/science/article/pii/S0020025520306241)))
+This repository implements the **Gradient-Based Optimizer (GBO)**, a novel metaheuristic optimization algorithm inspired by gradient search techniques. The GBO algorithm was introduced by Ahmadianfar et al. in their 2020 paper: ([Gradient-Based Optimizer: A New Metaheuristic ... ]([Ahmadianfar, Iman, Omid Bozorg-Haddad, and Xuefeng Chu. "Gradient-based optimizer: A new metaheuristic optimization algorithm." Information Sciences 540 (2020): 131-159.](https://doi.org/10.1016/j.ins.2020.06.037](https://www.sciencedirect.com/science/article/pii/S0020025520306241)))
 
 > Ahmadianfar, I., Bozorg-Haddad, O., & Chu, X. (2020). Gradient-based optimizer: A new metaheuristic optimization algorithm. *Information Sciences*, 540, 131–159. [https://doi.org/10.1016/j.ins.2020.06.037](https://doi.org/10.1016/j.ins.2020.06.037) ([Gradient-Based Optimizer - File Exchange - MATLAB Central](https://www.mathworks.com/matlabcentral/fileexchange/131588-gradient-based-optimizer))
 
@@ -149,4 +149,4 @@ p1 / p2 / p3 / p4 + plot_layout(ncol = 1)
 
 ## 🧾 Citation
 
-> Heidari, A. A., Mirjalili, S., Faris, H., Aljarah, I., Mafarja, M., & Gad, H. E. (2021). Gradient-based optimizer: A new metaheuristic optimization algorithm. *Information Sciences*, 540, 131–159. [https://doi.org/10.1016/j.ins.2020.06.037](https://www.sciencedirect.com/science/article/pii/S0020025520306241)
+Ahmadianfar, Iman, Omid Bozorg-Haddad, and Xuefeng Chu. "Gradient-based optimizer: A new metaheuristic optimization algorithm." Information Sciences 540 (2020): 131-159.
