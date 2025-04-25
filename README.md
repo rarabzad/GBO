@@ -28,6 +28,7 @@ We aim to determine optimal **release decisions** for a reservoir system to mini
 nP <- 100       # Population size
 MaxIt <- 1000   # Max iterations
 lb <- 0         # Lower bound
+capacity <- 1000 # Maximum storage capacity
 ub <- capacity  # Upper bound
 ```
 
@@ -77,7 +78,6 @@ inflow <- as.numeric(Nile)
 n_years <- length(inflow)
 demand <- rnorm(n_years, inflow * 0.8, inflow * 0.8 * 0.2)
 evaporation <- rnorm(n_years, inflow * 0.2, inflow * 0.2 * 0.2)
-capacity <- 1000
 
 obj_function <- function(x) evaluate_policy(x)$cost
 
