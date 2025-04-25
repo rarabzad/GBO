@@ -1,2 +1,152 @@
-# GBO
-Gradient-based optimizer
+# Gradient-Based Optimizer (GBO) for Reservoir Operation Optimization
+
+## Introduction
+
+This repository implements the **Gradient-Based Optimizer (GBO)**, a novel metaheuristic optimization algorithm inspired by gradient search techniques. The GBO algorithm was introduced by Ahmadianfar et al. in their 2020 paper: ([Gradient-Based Optimizer: A New Metaheuristic ... ]([https://www.researchgate.net/publication/342456958_Gradient-Based_Optimizer_A_New_Metaheuristic_Optimization_Algorithm?utm_source=chatgpt.com](https://doi.org/10.1016/j.ins.2020.06.037](https://www.sciencedirect.com/science/article/pii/S0020025520306241)))
+
+> Ahmadianfar, I., Bozorg-Haddad, O., & Chu, X. (2020). Gradient-based optimizer: A new metaheuristic optimization algorithm. *Information Sciences*, 540, 131–159. [https://doi.org/10.1016/j.ins.2020.06.037](https://doi.org/10.1016/j.ins.2020.06.037) ([Gradient-Based Optimizer - File Exchange - MATLAB Central](https://www.mathworks.com/matlabcentral/fileexchange/131588-gradient-based-optimizer))
+
+## 🔧 Problem Description
+
+We aim to determine optimal **release decisions** for a reservoir system to minimize squared water supply deficits while preventing over-releasing and managing evaporation, storage limits, and possible spill.
+
+- **Input Data:**
+  - `Nile` inflow time series (built-in R dataset)
+  - Synthetic demands: 80% of inflow + noise
+  - Evaporation: 20% of inflow + noise
+
+- **Constraints:**
+  - Storage cannot exceed capacity
+  - Releases cannot exceed demand
+  - Spill occurs if storage exceeds capacity
+
+---
+
+## ⚙️ GBO Settings
+
+```r
+nP <- 100       # Population size
+MaxIt <- 1000   # Max iterations
+lb <- 0         # Lower bound
+ub <- capacity  # Upper bound
+```
+
+---
+
+## 🧠 Cost Function
+
+The cost function considers:
+- Squared deficits (unmet demand)
+- Penalty for over-releasing more than demand
+
+```r
+# Returns cost and full system states
+evaluate_policy <- function(release) {
+    release <- pmin(pmax(release, 0), capacity)
+    storage <- numeric(n_years + 1)
+    spill <- numeric(n_years)
+    deficit <- numeric(n_years)
+    storage[1] <- capacity / 2
+
+    for (t in 1:n_years) {
+        net_storage = storage[t] + inflow[t] - release[t] - evaporation[t]
+        spill[t] <- max(0, net_storage - capacity)
+        storage[t + 1] <- min(max(net_storage, 0), capacity)
+        deficit[t] <- max(0, demand[t] - release[t])
+    }
+
+    penalty <- sum(pmax(0, release - demand)) * 100
+    total_deficit <- sum(deficit^2)
+
+    return(list(
+      cost = total_deficit + penalty,
+      storage = storage,
+      spill = spill,
+      release = release,
+      deficit = deficit
+    ))
+}
+```
+
+---
+
+## 🚀 Optimization Execution
+
+```r
+inflow <- as.numeric(Nile)
+n_years <- length(inflow)
+demand <- rnorm(n_years, inflow * 0.8, inflow * 0.8 * 0.2)
+evaporation <- rnorm(n_years, inflow * 0.2, inflow * 0.2 * 0.2)
+capacity <- 1000
+
+obj_function <- function(x) evaluate_policy(x)$cost
+
+result <- GBO(nP, MaxIt, lb, ub, n_years, obj_function)
+
+state <- evaluate_policy(result$Best_X)
+```
+
+---
+
+## 📈 Visualizations with `ggplot2`
+
+```r
+library(ggplot2)
+library(patchwork)
+
+# Prepare data
+df_main <- data.frame(
+  Year = 1:n_years,
+  Release = state$release,
+  Demand = demand,
+  Storage = state$storage[-1],
+  Spill = state$spill
+)
+
+df_convergence <- data.frame(
+  Iteration = 1:length(result$Convergence_curve),
+  BestCost = result$Convergence_curve
+)
+
+# 1. Convergence
+p1 <- ggplot(df_convergence, aes(x = Iteration, y = BestCost)) +
+  geom_line(color = "steelblue") +
+  labs(title = "Convergence Curve", x = "Iteration", y = "Best Cost") +
+  theme_minimal()
+
+# 2. Release vs Demand
+p2 <- ggplot(df_main, aes(x = Year)) +
+  geom_line(aes(y = Release), color = "blue") +
+  geom_line(aes(y = Demand), color = "red", linetype = "dashed") +
+  labs(title = "Release vs Demand", y = "Volume") +
+  theme_minimal()
+
+# 3. Storage
+p3 <- ggplot(df_main, aes(x = Year, y = Storage)) +
+  geom_line(color = "darkgreen") +
+  labs(title = "Storage Over Time", y = "Storage (MCM)") +
+  theme_minimal()
+
+# 4. Spill
+p4 <- ggplot(df_main, aes(x = Year, y = Spill)) +
+  geom_col(fill = "darkred") +
+  labs(title = "Spill Over Time", y = "Spill (MCM)") +
+  theme_minimal()
+
+# Combine all
+p1 / p2 / p3 / p4 + plot_layout(ncol = 1)
+```
+
+---
+
+## 📌 Notes
+
+- This implementation helps visualize how water is managed over time.
+- Optimization balances supply, demand, and operational limits.
+- Results show the effectiveness of GBO in water resources planning.
+
+---
+
+## 🧾 Citation
+
+> Heidari, A. A., Mirjalili, S., Faris, H., Aljarah, I., Mafarja, M., & Gad, H. E. (2021). Gradient-based optimizer: A new metaheuristic optimization algorithm. *Information Sciences*, 540, 131–159. [https://doi.org/10.1016/j.ins.2020.06.037](https://www.sciencedirect.com/science/article/pii/S0020025520306241)
