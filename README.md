@@ -22,14 +22,21 @@ We aim to determine optimal **release decisions** for a reservoir system to mini
 
 ---
 
-## ⚙️ GBO Settings
+## ⚙️ Initialization & GBO Settings
 
 ```r
+inflow <- as.numeric(Nile)   # Nile R. Annual flow
+n_years <- length(inflow)
+demand <- rnorm(n_years, inflow * 0.9, inflow * 0.9 * 0.2) # Create synthetic demand
+evaporation <- rnorm(n_years, inflow * 0.2, inflow * 0.2 * 0.2) # Create synthetic evaporation
+
 nP <- 100       # Population size
 MaxIt <- 1000   # Max iterations
-lb <- 0         # Lower bound
-capacity <- 1000 # Maximum storage capacity
-ub <- capacity  # Upper bound
+lb <- rep(0,n_years)         # Lower bound
+max_capacity <- 1000 # Maximum storage capacity
+min_capacity <- 100
+ub <- demand  # Upper bound
+
 ```
 
 ---
@@ -42,25 +49,27 @@ The cost function considers:
 
 ```r
 # Returns cost and full system states
-evaluate_policy <- function(release) {
-    release <- pmin(pmax(release, 0), capacity)
+evaluate_policy <- function(release)
+{
     storage <- numeric(n_years + 1)
     spill <- numeric(n_years)
     deficit <- numeric(n_years)
     storage[1] <- capacity / 2
+    penalty<-0
 
-    for (t in 1:n_years) {
+    for (t in 1:n_years)
+    {
         net_storage = storage[t] + inflow[t] - release[t] - evaporation[t]
-        spill[t] <- max(0, net_storage - capacity)
-        storage[t + 1] <- min(max(net_storage, 0), capacity)
+        spill[t] <- max(0, net_storage - max_capacity)
+        storage[t + 1] <- min(max(net_storage, min_capacity), max_capacity)
+        if(net_storage < min_capacity) penalty<-penalty+(min_capacity-net_storage)*100
         deficit[t] <- max(0, demand[t] - release[t])
     }
 
-    penalty <- sum(pmax(0, release - demand)) * 100
     total_deficit <- sum(deficit^2)
 
     return(list(
-      cost = total_deficit + penalty,
+      cost = total_deficit + sum(penalty),
       storage = storage,
       spill = spill,
       release = release,
@@ -74,14 +83,9 @@ evaluate_policy <- function(release) {
 ## 🚀 Optimization Execution
 
 ```r
-inflow <- as.numeric(Nile)
-n_years <- length(inflow)
-demand <- rnorm(n_years, inflow * 0.8, inflow * 0.8 * 0.2)
-evaporation <- rnorm(n_years, inflow * 0.2, inflow * 0.2 * 0.2)
-
 obj_function <- function(x) evaluate_policy(x)$cost
 
-result <- GBO(nP, MaxIt, lb, ub, n_years, obj_function)
+result <- GBO(nP, MaxIt, lb, ub, obj_function)
 
 state <- evaluate_policy(result$Best_X)
 ```
