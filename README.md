@@ -16,10 +16,9 @@ We aim to determine optimal **release decisions** for a reservoir system to mini
   - Evaporation: 20% of inflow + noise
 
 - **Constraints:**
-  - Storage cannot exceed capacity
+  - Storage cannot exceed capacity extremes 
   - Releases cannot exceed demand
   - Spill occurs if storage exceeds capacity
-
 ---
 
 ## ⚙️ Initialization & GBO Settings
@@ -83,6 +82,8 @@ evaluate_policy <- function(release)
 ## 🚀 Optimization Execution
 
 ```r
+source("https://raw.githubusercontent.com/rarabzad/GBO/refs/heads/main/GBO.R")
+
 obj_function <- function(x) evaluate_policy(x)$cost
 
 result <- GBO(nP, MaxIt, lb, ub, obj_function)
