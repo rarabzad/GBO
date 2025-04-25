@@ -53,7 +53,7 @@ evaluate_policy <- function(release)
     storage <- numeric(n_years + 1)
     spill <- numeric(n_years)
     deficit <- numeric(n_years)
-    storage[1] <- capacity / 2
+    storage[1] <- max_capacity / 2
     penalty<-0
 
     for (t in 1:n_years)
