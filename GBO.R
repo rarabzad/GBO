@@ -25,12 +25,11 @@ initialization<-function(nP, dim, ub, lb)
     return(X)
 }
 
-GBO<-function(nP, MaxIt, lb, ub, dim, fobj)
+GBO<-function(nP, MaxIt, lb, ub, fobj)
 {
     # Initialization
     pr <- 0.5
-    lb <- rep(lb, dim)
-    ub <- rep(ub, dim)
+    dim <- length(lb)
     X <- initialization(nP, dim, ub, lb)
     Cost <- apply(X, 1, fobj)
     
